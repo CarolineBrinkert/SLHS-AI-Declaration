@@ -3,182 +3,228 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>GAI Use Declaration Generator — Custom</title>
-  <!--
-    BU License (c) 2025 Caroline Brinkert & Contributors
-    Permission is hereby granted, free of charge, to any person obtaining a copy
-    of this software and associated documentation files (the "Software"), to deal
-    in the Software without restriction, including without limitation the rights
-    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-    copies of the Software, and to permit persons to do so, subject to the following conditions:
-    The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-  -->
+  <title>SLHS AI Use Declaration — Generator</title>
   <style>
-    :root{
-      --bg:#ffffff; --fg:#111; --muted:#666; --line:#e5e7eb; --accent:#111; --accent-fg:#fff; --radius:14px;
-    }
+    :root{--bg:#fff;--fg:#111;--muted:#555;--line:#e5e7eb;--accent:#111;--radius:14px}
     *{box-sizing:border-box}
-    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--fg);margin:0}
-    header{max-width:980px;margin:32px auto 12px;padding:0 16px}
-    main{max-width:980px;margin:0 auto 64px;padding:0 16px}
-    h1{font-size:clamp(1.35rem,1.5rem + 1vw,2rem);margin:.2rem 0 .5rem}
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:0;color:var(--fg);background:var(--bg)}
+    header,main{max-width:980px;margin:0 auto;padding:0 16px}
+    header{margin-top:28px;margin-bottom:10px}
+    h1{font-size:clamp(1.35rem,1.2rem + 1.2vw,2rem);margin:.2rem 0 .6rem}
     p.lead{color:var(--muted);margin:.2rem 0 1rem}
-    .panel{border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin:14px 0}
+    .panel{border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin:14px 0;background:#fff}
     .grid{display:grid;gap:14px}
-    .cols{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+    .cols{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
     fieldset{border:1px dashed var(--line);border-radius:var(--radius);padding:12px}
-    legend{padding:0 6px;color:#333;font-weight:600}
+    legend{padding:0 6px;font-weight:600;color:#333}
     label{display:block}
-    input[type="text"],textarea,select{width:100%;padding:10px;border:1px solid var(--line);border-radius:12px;font:inherit}
-    textarea{min-height:160px}
+    input[type=text],textarea,select{width:100%;padding:10px;border:1px solid var(--line);border-radius:12px;font:inherit}
+    textarea{min-height:140px}
     .row{display:flex;align-items:center;gap:.55rem}
     .muted{color:var(--muted)}
     details summary{cursor:pointer;user-select:none}
-    button{border:1px solid var(--accent);background:var(--accent);color:var(--accent-fg);padding:.7rem 1rem;border-radius:12px;font-weight:600;cursor:pointer}
-    button.ghost{background:transparent;color:var(--accent);}
-    .stack{display:flex;flex-wrap:wrap;gap:8px}
+    button{border:1px solid var(--accent);background:var(--accent);color:#fff;padding:.65rem 1rem;border-radius:12px;font-weight:600;cursor:pointer}
+    button.ghost{background:transparent;color:var(--accent)}
     .toolbar{display:flex;gap:8px;flex-wrap:wrap}
     .out{background:#fafafa}
-    .chip{display:inline-flex;align-items:center;gap:.35rem;border:1px solid var(--line);padding:.25rem .6rem;border-radius:999px;font-size:.85rem}
-    .kbd{font:inherit;border:1px solid var(--line);background:#f3f4f6;padding:.1rem .35rem;border-radius:6px}
-    .footer{color:var(--muted);font-size:.9rem;margin-top:6px}
+    pre.schema{white-space:pre-wrap;background:#f8fafc;border:1px solid var(--line);padding:12px;border-radius:12px;max-height:280px;overflow:auto}
+    @media print{header,.toolbar,details>summary{display:none} textarea#out{border:none;background:transparent;min-height:auto}}
   </style>
 </head>
 <body>
   <header>
-    <h1>GAI Use Declaration Generator — Custom</h1>
-    <p class="lead">Standalone, no build tools. Paste this file into CodeX/VS Code/GitHub Pages and personalize the tasks, wording, or styles.</p>
+    <h1>SLHS AI Use Declaration — Generator</h1>
+    <p class="lead">Create a short, transparent statement about how (or if) you used generative AI for clinic work, coursework, or research.</p>
+    <div class="panel" style="margin-top:10px">
+      <strong>What is this?</strong>
+      <p class="muted" style="margin:.35rem 0 0">Pick your context, check tasks that AI assisted with, and generate a paragraph to paste into your assignment, report, or manuscript. No data is uploaded; everything runs in your browser.</p>
+    </div>
   </header>
 
   <main>
     <section class="panel grid">
+      <div class="grid">
+        <label for="mode"><strong>Mode</strong> <span class="muted">(choose a preset taxonomy)</span></label>
+        <select id="mode">
+          <option value="clinic">Clinic</option>
+          <option value="coursework">Coursework</option>
+          <option value="research">Research / Thesis</option>
+        </select>
+      </div>
+
       <div class="grid" role="region" aria-labelledby="who">
-        <label for="who"><strong>1) Responsible person or group</strong></label>
-        <input id="who" type="text" placeholder="e.g., Caroline Brinkert; or ‘Collective responsibility’" />
+        <label for="who"><strong>Responsible person or group</strong></label>
+        <input id="who" type="text" placeholder="e.g., Caroline Brinkert / The authors / Clinic team" />
       </div>
 
       <div class="grid" role="region" aria-labelledby="when">
-        <label for="when"><strong>2) Date (ISO)</strong></label>
+        <label for="when"><strong>Date (ISO)</strong></label>
         <input id="when" type="text" placeholder="YYYY-MM-DD (auto-fills today)" />
       </div>
 
       <div class="grid" role="region" aria-labelledby="model">
-        <label for="model"><strong>3) Model(s) used</strong></label>
-        <input id="model" type="text" placeholder="e.g., GPT‑5 Thinking (OpenAI), Claude 3.7, Gemini 2.0; include version/date" />
+        <label for="model"><strong>Model(s) used</strong></label>
+        <input id="model" type="text" placeholder="e.g., GPT‑5 Thinking (OpenAI), Claude 3.7, Gemini 2.0 — include version/date if known" />
       </div>
 
       <div class="grid" role="region" aria-label="scope">
-        <label for="scope"><strong>4) Context (course / project / clinic)</strong></label>
-        <input id="scope" type="text" placeholder="e.g., SH732 Stuttering & Related Disorders — counseling micro‑skills unit" />
+        <label for="scope"><strong>Context (course / clinic / project)</strong></label>
+        <input id="scope" type="text" placeholder="e.g., SH732 counseling microskills; clinic session planning; thesis methods" />
       </div>
 
       <fieldset>
-        <legend>5) Delegated tasks (edit this taxonomy below)</legend>
+        <legend>Delegated tasks (by mode)</legend>
         <div id="taxonomy"></div>
-        <p class="footer">Tip: Filter quickly with <span class="kbd">Ctrl/⌘</span>+<span class="kbd">F</span>. You can also pass URL params like <code>?check=Writing%20%26%20Editing:Proofreading%20and%20editing</code>.</p>
+        <p class="muted" style="margin-top:8px">Some items (e.g., data analysis) include an <em>involvement level</em> selector to clarify whether AI <em>verified</em> human results or <em>automated</em> analyses.</p>
       </fieldset>
 
       <div class="grid" role="region" aria-labelledby="notes">
-        <label for="notes"><strong>6) Additional notes</strong> <span class="muted">(ethics, FERPA/PHI, verification, citations, prompt provenance)</span></label>
-        <textarea id="notes" placeholder="e.g., Prompts reviewed by faculty; no PHI entered; outputs verified for factual accuracy and bias; citations checked."></textarea>
+        <label for="notes"><strong>Additional notes (optional)</strong> <span class="muted">(ethics/FERPA/PHI, verification, citations)</span></label>
+        <textarea id="notes" placeholder="e.g., No PHI entered; outputs verified for accuracy/bias; citations checked; prompts archived."></textarea>
       </div>
 
       <div class="toolbar">
         <button id="btnGen" type="button">Generate declaration</button>
-        <button id="btnCopy" class="ghost" type="button" title="Copy to clipboard">Copy</button>
-        <button id="btnMD" class="ghost" type="button" title="Download Markdown">Download .md</button>
-        <button id="btnReset" class="ghost" type="button" title="Clear selections">Reset</button>
+        <button id="btnCopy" class="ghost" type="button">Copy</button>
+        <button id="btnMD" class="ghost" type="button">Download .md</button>
+        <button id="btnReset" class="ghost" type="button">Reset</button>
       </div>
 
       <div class="grid">
         <label for="out"><strong>Generated declaration</strong></label>
         <textarea id="out" class="out" readonly placeholder="Your declaration will appear here…"></textarea>
       </div>
-
-      <p class="footer">Customization pointers: Edit the <code>GAI_TAXONOMY</code> object, tweak the <code>template()</code) function, and adjust styles above. No external libraries.</p>
     </section>
 
     <section class="panel">
       <details>
-        <summary><strong>🔧 Configure task taxonomy (click to view/edit code)</strong></summary>
-        <p class="muted">This JSON drives the checkbox UI. Rename headings, add/remove items, or add SLP‑specific sections.</p>
-        <pre id="schema" style="white-space:pre-wrap;background:#f8fafc;border:1px solid var(--line);padding:12px;border-radius:12px;max-height:280px;overflow:auto"></pre>
+        <summary><strong>🔧 View current taxonomy schema (read-only)</strong></summary>
+        <pre id="schema" class="schema"></pre>
       </details>
     </section>
-
-    <section class="panel">
-      <details>
-        <summary><strong>📄 Sample policy text (optional)</strong></summary>
-        <p class="muted">Drop-in snippet you can paste under Acknowledgments/Methods/CRediT.</p>
-        <div class="stack">
-          <span class="chip">Accuracy review</span>
-          <span class="chip">Bias & ethics</span>
-          <span class="chip">Attribution</span>
-          <span class="chip">Versioning</span>
-        </div>
-        <p>
-        <em>Policy:</em> Generative AI may support defined tasks (e.g., idea generation, editing, figure drafting) when used transparently and responsibly. All AI-assisted content must be reviewed by the author(s) for accuracy, original meaning, confidentiality, and bias. No PHI/FERPA-protected information may be entered into AI systems without prior authorization. Model name, provider, and date/version must be recorded in the declaration.
-        </p>
-      </details>
-    </section>
-
   </main>
 
   <script>
-    // --- Taxonomy (edit to personalize) ---------------------------------------
-  const TAXONOMY_CLINIC = {
-"Literature & Synthesis": [
-"Search string brainstorming",
-"Article summary / annotated bibliography",
-"Theme coding brainstorm (conceptual)"
-],
-"Methods & Materials": [
-"Method text drafting (author‑verified)",
-"Protocol/checklist drafting",
-"Code/comments rewrite (readability)"
-],
-"Data & Analysis": [
-{ label: "Data analysis — verification of human‑run results", involvement: ["Consult","Assist","Verify"] },
-{ label: "Data analysis — model executed statistical tests", involvement: ["Co‑create","Automate"] },
-"Visualization / figure drafting",
-"Table generation"
-],
-"Documentation & Compliance": [
-"Citation formatting (APA/AMA)",
-"Preregistration / checklist prompts",
-"Consent/IRB boilerplate suggestions (non‑binding)"
-]
-};
+    // ----------------- Taxonomy presets (three modes) -------------------------
+    const TAXONOMY_CLINIC = {
+      "Planning & Session Prep": [
+        "Session plan outline (non‑PHI)",
+        "Goal brainstorming (de‑identified)",
+        "Activity sequencing",
+        "Homework / carryover ideas",
+        "Prompting scripts / visual supports text"
+      ],
+      "Materials & Activities": [
+        "Picture / word lists (non‑PHI)",
+        "Carrier phrases & exemplars",
+        "Minimal pairs / contrast sets",
+        "Worksheet / handout draft",
+        "Slide / visual aid draft"
+      ],
+      "Counseling & Communication": [
+        "Feedback language drafting",
+        "Email drafts to stakeholders (tone help)"
+      ],
+      "Documentation": [
+        "Progress note phrasing (template; de‑identified)",
+        "Short summary statements",
+        "Goal template wording"
+      ]
+    };
 
+    const TAXONOMY_COURSEWORK = {
+      "Writing & Summaries": [
+        "Proofreading and editing",
+        "Article summary / synthesis",
+        "Outline / bullet points",
+        "Study guide bullets",
+        "Reference list formatting"
+      ],
+      "Case Studies & Assignments": [
+        "Case vignette drafting (fictionalized)",
+        "Discussion prompts",
+        "Rubric criteria suggestions",
+        "Reflection starter questions"
+      ],
+      "Documentation & Reports": [
+        "Report section drafting (de‑identified)",
+        "Progress note phrasing (template; de‑identified)",
+        "Goal template wording"
+      ],
+      "Studying & Quiz Prep": [
+        "Practice questions (concept checks)",
+        "Flashcards generation",
+        "Mnemonic ideas"
+      ],
+      "Citations & Academic Integrity": [
+        "APA/AMA citation help",
+        "Reference list formatting",
+        "Paraphrase check / attribution reminders"
+      ]
+    };
 
-// Quick mode overlay trims presets for small/low‑stakes tasks
-const QUICK_TRIM = {
-removeGroups: [
-"Documentation & Compliance",
-"Methods & Materials",
-"Data & Analysis"
-],
-keepOnlyInWriting: [
-"Proofreading and editing",
-"Article summary / synthesis",
-"Outline / bullet points",
-"Study guide bullets",
-"Reference list formatting"
-]
-};
+    const TAXONOMY_RESEARCH = {
+      "Thesis / Manuscript Writing": [
+        "Section drafting (author‑edited)",
+        "Proofreading and editing",
+        "Plain‑language summary / lay abstract",
+        "Reviewer response drafting (author‑edited)"
+      ],
+      "Literature & Synthesis": [
+        "Search string brainstorming",
+        "Article summary / annotated bibliography",
+        "Theme coding brainstorm (conceptual)"
+      ],
+      "Methods & Materials": [
+        "Method text drafting (author‑verified)",
+        "Protocol/checklist drafting",
+        "Code/comments rewrite (readability)"
+      ],
+      "Data & Analysis": [
+        { label: "Data analysis — verification of human‑run results", involvement: ["Consult","Assist","Verify"] },
+        { label: "Data analysis — model executed statistical tests", involvement: ["Co‑create","Automate"] },
+        "Visualization / figure drafting",
+        "Table generation"
+      ],
+      "Documentation & Compliance": [
+        "Citation formatting (APA/AMA)",
+        "Preregistration / checklist prompts",
+        "Consent/IRB boilerplate suggestions (non‑binding)"
+      ]
+    };
 
-
-// Current working schema (built from presets per mode)
-let CURRENT_SCHEMA = {};
-
-    // --- Utilities ------------------------------------------------------------
+    // ----------------- Utilities + state -------------------------------------
     const $ = (q, el=document) => el.querySelector(q);
     const $$ = (q, el=document) => [...el.querySelectorAll(q)];
     const todayISO = () => new Date().toISOString().slice(0,10);
 
+    let CURRENT_SCHEMA = {};
+
+    function normalize(schema){
+      // Convert string items into objects: {label, involvement?}
+      const out = {};
+      Object.entries(schema).forEach(([group, items]) => {
+        out[group] = items.map(item => typeof item === 'string' ? { label:item } : item);
+      });
+      return out;
+    }
+
+    function getBaseSchema(){
+      const mode = $('#mode').value;
+      if(mode === 'clinic') return normalize(TAXONOMY_CLINIC);
+      if(mode === 'coursework') return normalize(TAXONOMY_COURSEWORK);
+      return normalize(TAXONOMY_RESEARCH);
+    }
+
+    function rebuildSchema(){
+      CURRENT_SCHEMA = getBaseSchema();
+      buildTaxonomy($('#taxonomy'));
+      $('#schema').textContent = JSON.stringify(CURRENT_SCHEMA, null, 2);
+    }
+
     function buildTaxonomy(container){
       container.innerHTML = '';
-      Object.entries(GAI_TAXONOMY).forEach(([group, items]) => {
+      Object.entries(CURRENT_SCHEMA).forEach(([group, items]) => {
         const details = document.createElement('details');
         details.open = true;
         const summary = document.createElement('summary');
@@ -187,15 +233,29 @@ let CURRENT_SCHEMA = {};
 
         const cols = document.createElement('div');
         cols.className = 'cols';
-        items.forEach(item => {
+        items.forEach(obj => {
           const lbl = document.createElement('label');
           lbl.className = 'row';
+
           const cb = document.createElement('input');
           cb.type = 'checkbox';
           cb.name = 'task';
-          cb.value = item;
+          cb.value = obj.label;
           lbl.appendChild(cb);
-          lbl.appendChild(document.createTextNode(' ' + item));
+          lbl.appendChild(document.createTextNode(' ' + obj.label));
+
+          if(obj.involvement){
+            const sel = document.createElement('select');
+            sel.name = 'involvement';
+            obj.involvement.forEach(opt => {
+              const o = document.createElement('option');
+              o.value = opt; o.textContent = opt; sel.appendChild(o);
+            });
+            sel.disabled = true; // enable only if box checked
+            cb.addEventListener('change', () => sel.disabled = !cb.checked);
+            lbl.appendChild(sel);
+          }
+
           cols.appendChild(lbl);
         });
         details.appendChild(cols);
@@ -205,15 +265,18 @@ let CURRENT_SCHEMA = {};
 
     function template({who, when, model, scope, tasks, notes}){
       const plural = /(collective|authors|team|group)/i.test(who) ? '' : 's';
-      const tasksText = tasks.length ? tasks.join(', ') : 'no tasks';
-      const lines = [
-        `${who} disclose${plural} that generative AI was considered and may have been used in ${scope || 'this work'} on ${when}.`,
-        tasks.length ? `Delegated tasks included: ${tasksText}.` : `No tasks were delegated to generative AI.`,
-        model ? `Model(s): ${model}.` : null,
-        `All outputs were reviewed for accuracy, meaning preservation, confidentiality, and bias mitigation prior to submission.`,
-        notes ? `Notes: ${notes}` : null
-      ].filter(Boolean);
-      return lines.join(' ');
+      const parts = [];
+      parts.push(`${who} disclose${plural} that generative AI was considered and may have been used in ${scope || 'this work'} on ${when}.`);
+      if(tasks.length){
+        const formatted = tasks.map(t => t.involvement ? `${t.label} (${t.involvement})` : t.label);
+        parts.push(`AI‑supported tasks: ${formatted.join(', ')}.`);
+      } else {
+        parts.push('No tasks were delegated to generative AI.');
+      }
+      if(model) parts.push(`Model(s)/version(s): ${model}.`);
+      parts.push('All AI outputs were reviewed for accuracy, preservation of meaning, confidentiality, and potential bias before submission.');
+      if(notes) parts.push(`Notes: ${notes}`);
+      return parts.join(' ');
     }
 
     function generate(){
@@ -221,68 +284,54 @@ let CURRENT_SCHEMA = {};
       const when = $('#when').value.trim() || todayISO();
       const model = $('#model').value.trim();
       const scope = $('#scope').value.trim();
-      const tasks = $$('input[name="task"]:checked').map(i => i.value);
+
+      const tasks = [];
+      $$('#taxonomy label').forEach(lbl => {
+        const cb = $('input[type="checkbox"]', lbl);
+        if(cb && cb.checked){
+          const sel = $('select[name="involvement"]', lbl);
+          tasks.push({ label: cb.value, involvement: sel ? sel.value : null });
+        }
+      });
+
       const notes = $('#notes').value.trim();
       $('#out').value = template({who, when, model, scope, tasks, notes});
     }
 
     async function copyOut(){
-      const txt = $('#out').value;
-      if(!txt) return;
+      const txt = $('#out').value; if(!txt) return;
       await navigator.clipboard.writeText(txt);
-      $('#btnCopy').textContent = 'Copied!';
-      setTimeout(()=>$('#btnCopy').textContent='Copy', 1200);
+      const btn = $('#btnCopy');
+      btn.textContent = 'Copied!';
+      setTimeout(()=>btn.textContent='Copy', 1200);
     }
 
     function downloadMarkdown(){
-      const body = $('#out').value || '# GAI Use Declaration\n\n(Generate first, then download.)';
-      const md = `# GAI Use Declaration\n\n${body}\n`;
+      const body = $('#out').value || '# AI Use Declaration\n\n(Generate first, then download.)';
+      const md = `# AI Use Declaration\n\n${body}\n`;
       const blob = new Blob([md], {type: 'text/markdown'});
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
-      a.download = 'gai-declaration.md';
+      a.download = 'slhs-ai-declaration.md';
       document.body.appendChild(a); a.click(); a.remove();
       setTimeout(()=>URL.revokeObjectURL(a.href), 1000);
     }
 
     function resetAll(){
       $('#who').value=''; $('#when').value=todayISO(); $('#model').value=''; $('#scope').value=''; $('#notes').value='';
-      $$('input[name="task"]').forEach(cb=> cb.checked=false);
+      rebuildSchema();
       $('#out').value='';
     }
 
-    function applyURLChecks(){
-      // Support query like ?check=Group:Item&check=Writing%20%26%20Editing:Proofreading%20and%20editing
-      const params = new URLSearchParams(location.search);
-      const checks = params.getAll('check');
-      if(!checks.length) return;
-      checks.forEach(spec => {
-        const [grp, item] = spec.split(':');
-        if(!grp || !item) return;
-        // Find the checkbox matching this label text under the matching group
-        $$('#taxonomy details').forEach(d => {
-          if(d.querySelector('summary').textContent.trim() === grp.trim()){
-            $$('label', d).forEach(lbl => {
-              if(lbl.textContent.trim() === item.trim()){
-                const cb = lbl.querySelector('input[type="checkbox"]');
-                if(cb) cb.checked = true;
-              }
-            });
-          }
-        });
-      });
-    }
-
-    // --- Init ----------------------------------------------------------------
+    // ----------------- Init ---------------------------------------------------
     document.addEventListener('DOMContentLoaded', () => {
-      buildTaxonomy($('#taxonomy'));
       $('#when').value = todayISO();
-      $('#schema').textContent = JSON.stringify(GAI_TAXONOMY, null, 2);
+      $('#mode').addEventListener('change', rebuildSchema);
       $('#btnGen').addEventListener('click', generate);
       $('#btnCopy').addEventListener('click', copyOut);
       $('#btnMD').addEventListener('click', downloadMarkdown);
       $('#btnReset').addEventListener('click', resetAll);
-      applyURLChecks();
+      rebuildSchema();
     });
   </script>
 </body>
